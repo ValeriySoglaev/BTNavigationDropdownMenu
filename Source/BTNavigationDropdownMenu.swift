@@ -26,9 +26,36 @@
 
 import UIKit
 
+
+public struct BadgeStruct {
+    
+    let badgeTitle: String
+    let badgeBackgroundColor: UIColor
+    let badgeTitleColor: UIColor
+    let badgeBorderLineColor: UIColor
+    
+    init(badgeTitle: String?, badgeBackgroundColor: UIColor?, badgeTitleColor: UIColor?, badgeBorderLineColor: UIColor?) {
+        self.badgeTitle = badgeTitle ?? ""
+        self.badgeBackgroundColor = badgeBackgroundColor ?? .red
+        self.badgeTitleColor = badgeTitleColor ?? .white
+        self.badgeBorderLineColor = badgeBorderLineColor ?? .white
+    }
+}
+
+// Struct datasource
+public struct ItemDropdownMenu {
+    let item: String?
+    let badge: BadgeStruct?
+
+    init(item: String?, badge: BadgeStruct) {
+        self.item  = item
+        self.badge = badge
+    }
+}
+
 // MARK: BTNavigationDropdownMenu
 open class BTNavigationDropdownMenu: UIView {
-
+    
     // The color of menu title. Default is darkGrayColor()
     open var menuTitleColor: UIColor! {
         get {
@@ -231,7 +258,7 @@ open class BTNavigationDropdownMenu: UIView {
     fileprivate var menuArrow: UIImageView!
     fileprivate var backgroundView: UIView!
     fileprivate var tableView: BTTableView!
-    fileprivate var items: [String]!
+    fileprivate var items: [ItemDropdownMenu]!
     fileprivate var menuWrapper: UIView!
 
     required public init?(coder aDecoder: NSCoder) {
@@ -248,7 +275,7 @@ open class BTNavigationDropdownMenu: UIView {
         - title: A string to define title to be displayed.
         - items: The array of items to select
      */
-    public convenience init(navigationController: UINavigationController? = nil, containerView: UIView = UIApplication.shared.keyWindow!, title: String, items: [String]) {
+    public convenience init(navigationController: UINavigationController? = nil, containerView: UIView = UIApplication.shared.keyWindow!, title: String, items: [ItemDropdownMenu]) {
 
         self.init(navigationController: navigationController, containerView: containerView, title: BTTitle.title(title), items: items)
     }
@@ -265,7 +292,7 @@ open class BTNavigationDropdownMenu: UIView {
         - title: An enum to define title to be displayed, can be a string or index of items.
         - items: The array of items to select
      */
-    public init(navigationController: UINavigationController? = nil, containerView: UIView = UIApplication.shared.keyWindow!, title: BTTitle, items: [String]) {
+    public init(navigationController: UINavigationController? = nil, containerView: UIView = UIApplication.shared.keyWindow!, title: BTTitle, items: [ItemDropdownMenu]) {
         // Key window
         guard let window = UIApplication.shared.keyWindow else {
             super.init(frame: CGRect.zero)
@@ -286,7 +313,7 @@ open class BTNavigationDropdownMenu: UIView {
         switch title{
         case .index(let index):
             if index < items.count{
-                titleToDisplay = items[index]
+                titleToDisplay = items[index].item ?? ""
             } else {
                 titleToDisplay = ""
             }
@@ -349,7 +376,7 @@ open class BTNavigationDropdownMenu: UIView {
             }
             selfie.didSelectItemAtIndexHandler!(indexPath)
             if selfie.shouldChangeTitleText! {
-                selfie.setMenuTitle("\(selfie.tableView.items[indexPath])")
+                selfie.setMenuTitle("\(selfie.tableView.items[indexPath].item ?? "")")
             }
             self?.hideMenu()
             self?.layoutSubviews()
@@ -406,7 +433,7 @@ open class BTNavigationDropdownMenu: UIView {
         }
     }
 
-    open func updateItems(_ items: [String]) {
+    open func updateItems(_ items: [ItemDropdownMenu]) {
         if !items.isEmpty {
             self.tableView.items = items
             self.tableView.reloadData()
@@ -418,7 +445,7 @@ open class BTNavigationDropdownMenu: UIView {
         self.tableView.reloadData()
 
         if self.shouldChangeTitleText! {
-            self.setMenuTitle("\(self.tableView.items[index])")
+            self.setMenuTitle("\(self.tableView.items[index].item ?? "")")
         }
     }
 

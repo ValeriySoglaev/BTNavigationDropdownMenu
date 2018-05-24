@@ -30,18 +30,21 @@ class BTTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
     var selectRowAtIndexPathHandler: ((_ indexPath: Int) -> ())?
     
     // Private properties
-    var items: [String] = []
+    var items: [ItemDropdownMenu] = []
     var selectedIndexPath: Int?
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    init(frame: CGRect, items: [String], title: String, configuration: BTConfiguration) {
+    init(frame: CGRect, items: [ItemDropdownMenu], title: String, configuration: BTConfiguration) {
         super.init(frame: frame, style: UITableViewStyle.plain)
         
         self.items = items
-        self.selectedIndexPath = items.index(of: title)
+        self.selectedIndexPath = items.index(where: { (item) -> Bool in
+            item.item == title
+        })
+
         self.configuration = configuration
         
         // Setup table view
@@ -75,11 +78,34 @@ class BTTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
+        let item = self.items[indexPath.row]
+        
         let cell = BTTableViewCell(style: UITableViewCellStyle.default, reuseIdentifier: "Cell", configuration: self.configuration)
-        cell.textLabel?.text = self.items[(indexPath as NSIndexPath).row]
+        cell.textLabel?.text = item.item
         cell.checkmarkIcon.isHidden = ((indexPath as NSIndexPath).row == selectedIndexPath) ? false : true
+        cell.badge.text = item.badge?.badgeTitle
+        cell.badge.isHidden = item.badge?.badgeTitle.isEmpty ?? true
+        cell.badge.backgroundColor = item.badge?.badgeBackgroundColor
+        cell.badge.textColor = item.badge?.badgeTitleColor
+        cell.badge.layer.borderWidth = 1
+        cell.badge.layer.borderColor = item.badge?.badgeBorderLineColor.cgColor
+        cell.badge.sizeToFit()
+
+        let badgeSize = cell.badge.frame
+        let height: CGFloat = (badgeSize.size.height) + 5.0
+        let width: CGFloat = (badgeSize.size.width) + 12.0
+
+
+        cell.badge.frame = CGRect(x: badgeSize.origin.x, y: badgeSize.origin.y, width: width, height: height)
+   
+        cell.badge.layer.cornerRadius = cell.badge.frame.height/2
+        cell.badge.layer.masksToBounds = true
+        
+        
+        
         return cell
-    }
+    } 
     
     // Table view delegate
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

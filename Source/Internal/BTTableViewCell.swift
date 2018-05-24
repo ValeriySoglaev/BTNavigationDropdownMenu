@@ -25,8 +25,9 @@ import UIKit
 
 class BTTableViewCell: UITableViewCell {
     let checkmarkIconWidth: CGFloat = 50
-    let horizontalMargin: CGFloat = 20
+    let horizontalMargin: CGFloat = 50
     
+    var badge: UILabel!
     var checkmarkIcon: UIImageView!
     var cellContentFrame: CGRect!
     var configuration: BTConfiguration!
@@ -40,9 +41,12 @@ class BTTableViewCell: UITableViewCell {
         cellContentFrame = CGRect(x: 0, y: 0, width: (UIApplication.shared.keyWindow?.frame.width)!, height: self.configuration.cellHeight)
         self.contentView.backgroundColor = self.configuration.cellBackgroundColor
         self.selectionStyle = UITableViewCellSelectionStyle.none
+        
         self.textLabel!.textColor = self.configuration.cellTextLabelColor
         self.textLabel!.font = self.configuration.cellTextLabelFont
         self.textLabel!.textAlignment = self.configuration.cellTextLabelAlignment
+        self.textLabel!.backgroundColor = .red
+        
         if self.textLabel!.textAlignment == .center {
             self.textLabel!.frame = CGRect(x: 0, y: 0, width: cellContentFrame.width, height: cellContentFrame.height)
         } else if self.textLabel!.textAlignment == .left {
@@ -50,6 +54,15 @@ class BTTableViewCell: UITableViewCell {
         } else {
             self.textLabel!.frame = CGRect(x: -horizontalMargin, y: 0, width: cellContentFrame.width, height: cellContentFrame.height)
         }
+        
+        // Badge
+        self.badge = UILabel(frame: CGRect(x: self.textLabel!.frame.minX / 2 - 16, y: cellContentFrame.midY - 20/2, width: 20, height: 20))
+        self.badge.font = UIFont.systemFont(ofSize: 11)
+        self.badge.minimumScaleFactor = 0.5
+        self.badge.textAlignment = .center
+        self.badge.layer.masksToBounds = true
+        self.badge.layer.cornerRadius  = self.badge.bounds.width / 2
+        self.contentView.addSubview(self.badge)
         
         // Checkmark icon
         if self.textLabel!.textAlignment == .center {
